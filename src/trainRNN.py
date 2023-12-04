@@ -12,26 +12,22 @@ from keras.models import Sequential
 from keras.layers import Dense, SimpleRNN, Conv1D
 from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
+import tensorflow as tf
+import fullTest
+from models import getModel
 
 def assembleData(trainSplit=0.7,validSplit=0.2,look_back=10, predict_len=3):
     flareSummary = pd.read_csv("../data/xrsSummary.csv",header=0)
-    date_time = pd.to_datetime(flareSummary.pop('Date_Time'), format='%Y-%m-%d %H:%M:%S')
 
-    # Convert timestamps to seconds
-    timestamp_s = date_time.map(pd.Timestamp.timestamp)
-    
     # Splitting Data
     
     N = len(flareSummary)
-    testSplit = 1.0 - trainSplit - validSplit
     
     trainData = flareSummary[0:int(N*trainSplit)].get("XRS_B_Flux")
     validData = flareSummary[int(N*trainSplit):int(N*(trainSplit+validSplit))].get("XRS_B_Flux")
     testData = flareSummary[int(N*(trainSplit+validSplit)):].get("XRS_B_Flux")
     
     
-
-    num_features = flareSummary.shape[1]
     
     # Normalize the data
     
@@ -62,20 +58,6 @@ def formatData(look_back,predict_len,data):
 
     return X, y
 
-# Define the RNN Model to train on
-def createModel(look_back,pred_len):
-    model = Sequential()
-    model.add(SimpleRNN(units=64,input_shape=(1,look_back), activation="relu", return_sequences=True))
-    # model.add(Conv1D(filters=10, kernel_size=2, activation="relu"))
-    model.add(SimpleRNN(32))
-    model.add(Dense(150, activation='relu'))
-    model.add(Dense(300, activation="relu"))
-    model.add(Dense(300,activation="relu"))
-    model.add(Dense(150, activation="relu"))
-    model.add(Dense(pred_len))
-    model.compile(loss='mse', optimizer='adam', metrics=['accuracy','mse'])
-    return model
-
 def getInput():
     persist = True
     validInput = False
@@ -90,14 +72,14 @@ def getInput():
         else:
             print("Response not recognized, please try again.")
     validInput = False
-    dirName = ""
+    modelName = ""
     while not validInput:
-        dirName = input("Please enter the name of the directory you want to persist the RNN to: ")
-        if dirName != "":
+        modelName = input("Please enter the name of the directory you want to persist the RNN to: ")
+        if modelName != "":
             validInput = True
         else:
             print("Response not recognized, please try again") 
-    return persist, dirName   
+    return persist, modelName   
 
 if __name__=="__main__":
     LOOK_BACK = 10
@@ -105,16 +87,16 @@ if __name__=="__main__":
     TRAIN_SPLIT = 0.7
     VALID_SPLIT = 0.2
     EPOCHS = 1000
+
+    print(tf.config.list_physical_devices('GPU'))
     if len(sys.argv) >= 2:
         PERSIST = True
-        dirName = sys.argv[1]
+        modelName = sys.argv[1]
     else:
-        PERSIST = False
-        dirName = ""
-    # PERSIST, dirName = getInput()
+        PERSIST, modelName = getInput()
 
     trainX, trainY, validX, validY, testX, testY = assembleData(TRAIN_SPLIT,VALID_SPLIT,LOOK_BACK,PRED_LEN)
-    model = createModel(LOOK_BACK,PRED_LEN)
+    model = getModel(LOOK_BACK,PRED_LEN)
     model.fit(trainX, 
               trainY, 
               epochs=EPOCHS, 
@@ -124,7 +106,7 @@ if __name__=="__main__":
               callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
 
     if PERSIST:
-        model.save(f"../models/{dirName}")
+        model.save(f"../models/{modelName}.keras")
     
     print(" ==== Evaluating Model ====")
     results = model.evaluate(testX,testY,batch_size=128)
@@ -148,6 +130,9 @@ if __name__=="__main__":
     plt.legend(loc="upper right")
     plt.semilogy()
     if PERSIST:
-        plt.savefig(f"../images/{dirName}.png")
-    plt.show()
-    
+        plt.savefig(f"../images/training/{modelName}.png")
+    else:
+        plt.show()
+    plt.clf()
+
+    fullTest.main(LOOK_BACK,PRED_LEN,modelName)    
