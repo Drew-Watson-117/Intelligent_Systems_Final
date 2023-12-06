@@ -97,7 +97,7 @@ def Simple_RNN(look_back, pred_len):
     return model
 
 # Return specified model
-def getModel(look_back,pred_len, fcn=Double_RNN_LR_Decay):
+def getModel(look_back,pred_len, fcn=Triple_RNN_LR_Decay):
     return fcn(look_back,pred_len)
 
 

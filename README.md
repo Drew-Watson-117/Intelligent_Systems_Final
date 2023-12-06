@@ -34,6 +34,8 @@ If you would like to train a new network from scratch and evaluate that network,
 ## Results
 
 - For this problem, using mean-absolute-error yields far better results than using mean-squared-error. MSE yielded high losses (~0.9) and low accuracies (< 0.2)
+- For the architectures which use an exponentially decaying learning rate, an initial learning rate of 1e-4 offered better results than using an initial learning rate of 1e-2 or 1e-3
+- Plots of network performance on the test data are given in the `images/training` directory. Plots of network performance on the entire dataset are given in the `images/fullEvaluation` directory.
 - Below is a table which contains each architecture I trained, and its corresponding Test Loss and Test Accuracy
 
 | Architecture           | Test Loss (MAE) | Test Accuracy |
@@ -41,13 +43,13 @@ If you would like to train a new network from scratch and evaluate that network,
 | Simple RNN             | 0.095           | 0.248         |
 | Simple RNN w/ LR Decay | 0.088           | 0.397         |
 | Double RNN             | 0.092           | 0.291         |
-| Double RNN w/ LR Decay | 
+| Double RNN w/ LR Decay | 0.088           | 0.489         |
 | Short Deep Net         | 0.092           | 0.451         |
 | Short Deep w/ LR Decay | 0.086           | 0.482         |
 | Triple RNN             | 0.098           | 0.359         |
-| Triple RNN w/ LR Decay | 
+| Triple RNN w/ LR Decay | 0.087           | 0.510         |
 
-- As shown above, the Short Deep Net with learning rate decay was the best architecture at minimizing loss and maximizing accuracy, with a test loss of 0.086 and a test accuracy of 48.2%. It should be noted that this architecture was ran with an initial learning rate of 1e-4, while many of the other LR Decay networks were run with an initial learning rate of 1e-3. It is very possible that this is a contributing factor to its good performance, and so it cannot be said that the Short Deep w/ LR Decay architecture is always better than the other architectures.
+- Short Deep w/ LR Decay, Triple RNN w/ LR Decay, and Double RNN w/ LR Decay performed best, with low loss and high accuracy. I predict that this is because I ran them with an initial learning rate of 1e-4 instead of 1e-3 (which is the initial learning rate I used when I ran the other networks with LR Decay). 
 
 
 ## Summary
