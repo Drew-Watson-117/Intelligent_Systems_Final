@@ -13,7 +13,7 @@ from keras.layers import Dense, SimpleRNN, Conv1D
 from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import fullTest
+import fullEvaluation
 from models import getModel
 
 def assembleData(trainSplit=0.7,validSplit=0.2,look_back=10, predict_len=3):
@@ -88,7 +88,6 @@ if __name__=="__main__":
     VALID_SPLIT = 0.2
     EPOCHS = 1000
 
-    print(tf.config.list_physical_devices('GPU'))
     if len(sys.argv) >= 2:
         PERSIST = True
         modelName = sys.argv[1]
@@ -135,4 +134,4 @@ if __name__=="__main__":
         plt.show()
     plt.clf()
 
-    fullTest.main(LOOK_BACK,PRED_LEN,modelName)    
+    fullEvaluation.main(LOOK_BACK,PRED_LEN,modelName)    

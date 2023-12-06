@@ -48,6 +48,10 @@ def main(look_back, pred_len, modelName):
     
     X, y = assembleData(look_back, pred_len)
 
+    print(" ==== Evaluating Model on ALL DATA ====")
+    results = model.evaluate(X,y,batch_size=128)
+    print(f"Loss = {results[0]}, Accuracy = {results[1]}")
+
     yHat = model.predict(X)
     
     plotPredictions = []
@@ -62,4 +66,8 @@ def main(look_back, pred_len, modelName):
     plt.ylabel("Normalized XRS_B Flux")
     plt.legend(loc="upper right")
     plt.semilogy()
-    plt.savefig(f"../images/fullTest/{modelName}.png")
+    plt.savefig(f"../images/fullEvaluation/{modelName}.png")
+
+if __name__=="__main__":
+    if len(sys.argv) > 1:
+        main(10,5,sys.argv[1])
